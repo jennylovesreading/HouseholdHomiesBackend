@@ -20,6 +20,9 @@ mongoose.connect(databaseURI, { useNewUrlParser: true, useUnifiedTopology: true 
 app.use(Router);
 
 // routes
+app.get("/", (req, res) => {
+    res.json({ message: "Welcome to bezkoder application." });
+  });
 // require('./routes/user.routes')(app);
 
 // set port, listen for requests
