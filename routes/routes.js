@@ -4,25 +4,27 @@ const userModel = require("../models/user.model");
 const app = express();
 
 app.post("/registerUser", async (request, response) => {
-    const userSubmitted = request.body;
+    const userSubmitted = request.body
+    console.log("userSubmitted");
+    console.log(userSubmitted);
     let errors = []
   
     if(!userSubmitted.firstName || !userSubmitted.lastName || !userSubmitted.username || !userSubmitted.email || !userSubmitted.password || !userSubmitted.confirmPassword || !userSubmitted.number) {
       errors.push("PLEASE FILL IN ALL FIELDS");
-    }
+    } else {  
+      if(userSubmitted.username.length < 6) {
+        errors.push("USERNAME TOO SHORT");
+      }
+  
+      if(userSubmitted.password.length < 6) {
+        errors.push("PASSWORD TOO SHORT");
+      }
 
-    if(userSubmitted.password !== userSubmitted.confirmPassword) {
-      errors.push("PASSWORDS DO NOT MATCH");
+      if(userSubmitted.password !== userSubmitted.confirmPassword) {
+        errors.push("PASSWORDS DO NOT MATCH");
+      }
     }
-
-    if(userSubmitted.username.length < 6) {
-      errors.push("USERNAME TOO SHORT");
-    }
-
-    if(userSubmitted.password.length < 6) {
-      errors.push("PASSWORD TOO SHORT");
-    }
-
+    
     if(errors.length > 0) {
       // MEANS SOMETHING WENT WRONG -- DECIDE WHAT WE WANT TO DISPLAY/HOW ------------------------------------------
       console.log(errors);

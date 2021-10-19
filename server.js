@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const Router = require("./routes/routes");
+const cors = require('cors');
 
 const app = express();
 
@@ -9,6 +10,8 @@ app.use(express.json());
 
 // parse requests of content-type - application/x-www-form-urlencoded
 app.use(express.urlencoded({ extended: true }));
+
+app.use(cors());
 
 // make a connection to mongoDB database
 const databaseURI = require('./config/db.config').MongoURI; // Database Config
@@ -21,12 +24,12 @@ app.use(Router);
 
 // routes
 app.get("/", (req, res) => {
-    res.json({ message: "Welcome to bezkoder application." });
+    res.json({ message: "EMPTY PAGE" });
   });
 // require('./routes/user.routes')(app);
 
 // set port, listen for requests
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}.`);
