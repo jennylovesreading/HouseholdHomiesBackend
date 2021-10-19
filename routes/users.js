@@ -3,6 +3,8 @@ const bcrypt = require('bcryptjs');
 const userModel = require("../models/user.model");
 const app = express();
 
+//NEED to handle redirection  of submit button on register and login form, not sure if that goes in backend
+//or frontend
 app.post("/registerUser", async (request, response) => {
     const userSubmitted = request.body
     console.log("userSubmitted");
@@ -73,6 +75,7 @@ app.post("/registerUser", async (request, response) => {
             
                     // PROBABLY REDIRECT TO THE SITE PAGE -----------------------------------------------------
                     response.sendStatus(200);
+                    //redirect (/)
                   })
                   .catch((err) => {
                     console.log("ERROR REGISTERING USER");
@@ -87,14 +90,44 @@ app.post("/registerUser", async (request, response) => {
     }
 });
 
-app.get("/users", async (request, response) => {
-    const users = await userModel.find({});
-  
-    try {
-      response.send(users);
-    } catch (error) {
-      response.status(500).send(error);
+
+app.post("/loginUser", async (request, response) => {
+  const userLoggedIn = request.body
+  console.log("userLoggedIn");
+  console.log(userLoggedIn);
+  let errors = []
+
+  userModel.findOne({ username: userLoggedIn.username }) // check for registered username
+  .then((user) => {
+    if(user) {
+      // User with this email already exists
+      // -----------------------------------------------------DISPLAY HOW WE WANT TO -----------------------
+      //don't send ok yet
+      // response.sendStatus(200);
+      const passwordEnteredByUser = userLoggedIn.password;
+      const hash = user.password;
+      bcrypt.compare(passwordEnteredByUser, hash, function(err, isMatch) {
+        if (err) {
+          throw err
+        } else if (!isMatch) {
+          console.log("Password doesn't match for this username!")
+          //redirect somewhere when password is wrong
+        } else {
+          console.log("Username and password correct!")
+        }
+      })
+      response.sendStatus(200);
     }
-});
+    else{
+      errors.push("The username does not exist")
+      console.log(errors);
+      //redirect somewhere when username is incorrect
+      response.sendStatus(200);
+    
+    }
+  });
+  });
+
+
 
 module.exports = app;
