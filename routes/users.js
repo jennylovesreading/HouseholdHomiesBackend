@@ -106,7 +106,7 @@ app.post("/loginUser", async (request, response) => {
       // response.sendStatus(200);
       const passwordEnteredByUser = userLoggedIn.password;
       const hash = user.password;
-      bcrypt.compare(passwordEnteredByUser, hash, function(err, isMatch) {
+      bcrypt.compare(passwordEnteredByUser, hash, (err, isMatch) => {
         if (err) {
           throw err
         } else if (!isMatch) {
@@ -127,8 +127,6 @@ app.post("/loginUser", async (request, response) => {
   }).catch((error) => {
     console.log(error);
   });
-  });
-
-
+});
 
 module.exports = app;
