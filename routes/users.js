@@ -111,7 +111,7 @@ app.post("/loginUser", async (request, response) => {
           throw err
         } else if (!isMatch) {
           console.log("Password doesn't match for this username!")
-          //redirect somewhere when password is wrong
+          //redirect somewhere when password is wrong 
         } else {
           console.log("Username and password correct!")
         }
@@ -123,8 +123,9 @@ app.post("/loginUser", async (request, response) => {
       console.log(errors);
       //redirect somewhere when username is incorrect
       response.sendStatus(200);
-    
     }
+  }).catch((error) => {
+    console.log(error);
   });
   });
 
