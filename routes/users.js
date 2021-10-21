@@ -6,12 +6,12 @@ const app = express();
 
 // Login Page
 app.get('/login', function(req, res){
-  res.redirect("/login");
+  res.send("/login");
 });
 
 // Registration Page
 app.get('/register', function(req, res){
-  res.redirect("/register");
+  res.send("/register");
 });
 
 //NEED to handle redirection  of submit button on register and login form, not sure if that goes in backend
@@ -90,8 +90,6 @@ app.post("/register", async (request, response) => {
                     passport.authenticate("local")(request, response, () => {
                       response.redirect("/");
                     }); // can use this to authenticate then immedietly login
-                    response.sendStatus(200);
-                    //redirect (/)
                   })
                   .catch((err) => {
                     console.log("ERROR REGISTERING USER");
