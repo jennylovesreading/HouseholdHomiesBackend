@@ -1,11 +1,22 @@
 const express = require("express");
 const bcrypt = require('bcryptjs');
 const userModel = require("../models/user.model");
+const passport = require("passport");
 const app = express();
+
+// Login Page
+app.get('/login', function(req, res){
+  res.redirect("/login");
+});
+
+// Registration Page
+app.get('/register', function(req, res){
+  res.redirect("/register");
+});
 
 //NEED to handle redirection  of submit button on register and login form, not sure if that goes in backend
 //or frontend
-app.post("/registerUser", async (request, response) => {
+app.post("/register", async (request, response) => {
     const userSubmitted = request.body
     console.log("userSubmitted");
     console.log(userSubmitted);
@@ -74,6 +85,11 @@ app.post("/registerUser", async (request, response) => {
                     console.log("USER REGISTERED");
             
                     // PROBABLY REDIRECT TO THE SITE PAGE -----------------------------------------------------
+                    
+                    
+                    passport.authenticate("local")(request, response, () => {
+                      response.redirect("/");
+                    }); // can use this to authenticate then immedietly login
                     response.sendStatus(200);
                     //redirect (/)
                   })
@@ -90,43 +106,19 @@ app.post("/registerUser", async (request, response) => {
     }
 });
 
+// Login Handle
+app.post('/login', function(req, res, next){
+  passport.authenticate('local', {
+      successRedirect: '/',
+      failureRedirect: '/login'
+  })(req, res, next);
+  console.log("logged in");
+});
 
-app.post("/loginUser", async (request, response) => {
-  const userLoggedIn = request.body
-  console.log("userLoggedIn");
-  console.log(userLoggedIn);
-  let errors = []
-
-  userModel.findOne({ username: userLoggedIn.username }) // check for registered username
-  .then((user) => {
-    if(user) {
-      // User with this email already exists
-      // -----------------------------------------------------DISPLAY HOW WE WANT TO -----------------------
-      //don't send ok yet
-      // response.sendStatus(200);
-      const passwordEnteredByUser = userLoggedIn.password;
-      const hash = user.password;
-      bcrypt.compare(passwordEnteredByUser, hash, (err, isMatch) => {
-        if (err) {
-          throw err
-        } else if (!isMatch) {
-          console.log("Password doesn't match for this username!")
-          //redirect somewhere when password is wrong 
-        } else {
-          console.log("Username and password correct!")
-        }
-      })
-      response.sendStatus(200);
-    }
-    else{
-      errors.push("The username does not exist")
-      console.log(errors);
-      //redirect somewhere when username is incorrect
-      response.sendStatus(200);
-    }
-  }).catch((error) => {
-    console.log(error);
-  });
+// Logout Handle
+app.get('/logout', function(req, res){
+  req.logout();
+  res.redirect('/');
 });
 
 module.exports = app;
