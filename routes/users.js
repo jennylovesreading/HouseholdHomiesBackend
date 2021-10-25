@@ -18,11 +18,9 @@ app.get('/register', function(req, res){
 //or frontend
 app.post("/register", async (request, response) => {
     const userSubmitted = request.body
-    console.log("userSubmitted");
-    console.log(userSubmitted);
     let errors = []
   
-    if(!userSubmitted.firstName || !userSubmitted.lastName || !userSubmitted.username || !userSubmitted.email || !userSubmitted.password || !userSubmitted.confirmPassword || !userSubmitted.number) {
+    if(!userSubmitted.houseName|| !userSubmitted.username || !userSubmitted.email || !userSubmitted.password || !userSubmitted.confirmPassword) {
       errors.push("PLEASE FILL IN ALL FIELDS");
     } else {  
       if(userSubmitted.username.length < 6) {
@@ -64,12 +62,10 @@ app.post("/register", async (request, response) => {
             } else {
               // user is now being created using our model
               const newUser = new userModel({
-                firstName: userSubmitted.firstName,
-                lastName: userSubmitted.lastName,
+                houseName: userSubmitted.houseName,
                 username: userSubmitted.username,
                 email: userSubmitted.email,
                 password: userSubmitted.password,
-                number: userSubmitted.number
               });
               
               bcrypt.genSalt(10, (err, salt) => {

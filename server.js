@@ -41,6 +41,7 @@ app.get("/", (req, res) => {
 });
 
 app.use(require('./routes/users'));
+app.use(require('./routes/household'));
 
 // set port, listen for requests
 const PORT = process.env.PORT || 8080;
