@@ -20,7 +20,7 @@ app.post("/register", async (request, response) => {
     const userSubmitted = request.body
     let errors = []
   
-    if(!userSubmitted.houseName|| !userSubmitted.username || !userSubmitted.email || !userSubmitted.password || !userSubmitted.confirmPassword) {
+    if(!userSubmitted.houseName|| !userSubmitted.username || !userSubmitted.password || !userSubmitted.confirmPassword) {
       errors.push("PLEASE FILL IN ALL FIELDS");
     } else {  
       if(userSubmitted.username.length < 6) {
@@ -39,74 +39,68 @@ app.post("/register", async (request, response) => {
     if(errors.length > 0) {
       // MEANS SOMETHING WENT WRONG -- DECIDE WHAT WE WANT TO DISPLAY/HOW ------------------------------------------
       console.log(errors);
-      response.sendStatus(200);
+      response.send(errors);
     } else {
       // user information has been validated
-      userModel.findOne({ email: userSubmitted.email }) // check for registered email
+      userModel.findOne({ username: userSubmitted.username }) // check for registered username
       .then((user) => {
         if(user) {
-          // User with this email already exists
-          errors.push("EMAIL ALREADY REGISTERED");
-          // -----------------------------------------------------DISPLAY HOW WE WANT TO -----------------------
+          // User with this username already exists
+          errors.push("USERNAME ALREADY REGISTERED");
+          // -----------------------------------------------------DISPLAY HOW WE WANT TO ----------------------
           console.log(errors);
-          response.sendStatus(200);
+          response.send(errors);
         } else {
-          userModel.findOne({ username: userSubmitted.username }) // check for registered username
-          .then((user) => {
-            if(user) {
-              // User with this username already exists
-              errors.push("USERNAME ALREADY REGISTERED");
-              // -----------------------------------------------------DISPLAY HOW WE WANT TO ----------------------
-              console.log(errors);
-              response.sendStatus(200);
-            } else {
-              // user is now being created using our model
-              const newUser = new userModel({
-                houseName: userSubmitted.houseName,
-                username: userSubmitted.username,
-                email: userSubmitted.email,
-                password: userSubmitted.password,
+          // user is now being created using our model
+          const newUser = new userModel({
+            houseName: userSubmitted.houseName,
+            username: userSubmitted.username,
+            password: userSubmitted.password,
+          });
+          
+          bcrypt.genSalt(10, (err, salt) => {
+            bcrypt.hash(newUser.password, salt, (err, hash) => {
+              if(err) {
+                throw err;
+              }
+        
+              newUser.password = hash;
+        
+              newUser.save()
+              .then(() => {
+                console.log("USER REGISTERED");
+                response.sendStatus(200);
+              })
+              .catch((err) => {
+                console.log("ERROR REGISTERING USER");
+                console.log(err);
               });
-              
-              bcrypt.genSalt(10, (err, salt) => {
-                bcrypt.hash(newUser.password, salt, (err, hash) => {
-                  if(err) {
-                    throw err;
-                  }
-            
-                  newUser.password = hash;
-            
-                  newUser.save()
-                  .then(() => {
-                    console.log("USER REGISTERED");
-            
-                    // PROBABLY REDIRECT TO THE SITE PAGE -----------------------------------------------------
-                    
-                    
-                    passport.authenticate("local")(request, response, () => {
-                      response.redirect("/");
-                    }); // can use this to authenticate then immedietly login
-                  })
-                  .catch((err) => {
-                    console.log("ERROR REGISTERING USER");
-                    console.log(err);
-                  });
-                });
-              });
-            }
+            });
           });
         }
       });
     }
 });
 
-// Login Handle
-app.post('/login', function(req, res, next){
-  passport.authenticate('local', {
-      successRedirect: '/',
-      failureRedirect: '/login'
+app.post('/login', function(req, res, next) {
+  passport.authenticate('local', function(err, user, info) {
+    if (err) { 
+      return next(err); 
+    }
+
+    if (!user) { 
+      console.log("redirected to login")
+      return res.sendStatus(200);
+    }
+
+    req.logIn(user, function(err) {
+      if (err) { 
+        return next(err); 
+      }
+      console.log("success")
+      return res.send(user);
+    });
   })(req, res, next);
-  console.log("logged in");
 });
 
 // Logout Handle

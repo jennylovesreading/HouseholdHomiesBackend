@@ -9,6 +9,7 @@ module.exports = function(passport) {
       // Match user
       userModel.findOne({ username: username }).then(function(user){
         if (!user) {
+            console.log("username wrong");
           return done(null, false, { message: 'That username is not registered' });
         }
 
@@ -19,8 +20,10 @@ module.exports = function(passport) {
           } 
 
           if (isMatch) {
+            console.log("logged in");
             return done(null, user);
           } else {
+            console.log("pass wrong");
             return done(null, false, { message: 'Password incorrect' });
           }
         });
