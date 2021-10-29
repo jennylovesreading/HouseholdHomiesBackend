@@ -84,21 +84,15 @@ app.post('/createGroup', (request, response) => {
 //once a group is created, our infinite cycle of texts begins 
 function sendChoresText(group){
 //set interval for every week
-
-
 //set interval for every day
 //loop through chores array based on head
-i=0;
-while(i != chores.length)
-{
-    i++;
+    let from = '+18162562790'
+    while(i < group.members.length) {
+        let to = group.members[i]["number"];
 
-    let from = '+18162562790'           
-    // for(const user of members) {
-    //     let to = user["number"];
-    //     freeclimb.api.messages.create(from, to, 'Hey ' + user["name"] + '! You have joined the household ' + request.user["houseName"] + '!').catch(err => {console.log(err)})
-    // }
-}
+        freeclimb.api.messages.create(from, to, 'Hey ' + group.members[i]["name"] + '! Your chores for the week are:')
+        .catch(err => console.log(err))
+    }
 }
 
 module.exports = app;
