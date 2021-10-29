@@ -63,6 +63,8 @@ app.post("/register", (req, res) => {
   
         await newUser.save().then(() => {
           res.send("User Created");
+        }).catch(() => {
+          res.send("Failed so Create User");
         });
       }
     });
