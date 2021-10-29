@@ -1,12 +1,21 @@
 const mongoose = require("mongoose");
 
 const GroupSchema = new mongoose.Schema({
+    houseName:{
+      type: String,
+      required: true
+    },
     members: {
       type: Array,
-      required: true,
+      required: true
     },
     chores: {
-      type: Array
+      type: Array,
+      required: true
+    },
+    head:{
+      type: Number,
+      required: true
     }
   });
   

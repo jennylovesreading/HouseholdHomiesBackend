@@ -1,106 +1,72 @@
 const express = require("express");
 const bcrypt = require('bcryptjs');
-const userModel = require("../models/user.model");
+const User = require("../models/user");
 const passport = require("passport");
+const e = require("express");
 const app = express();
-
-// Login Page
-app.get('/login', function(req, res){
-  res.send("/login");
-});
-
-// Registration Page
-app.get('/register', function(req, res){
-  res.send("/register");
-});
 
 //NEED to handle redirection  of submit button on register and login form, not sure if that goes in backend
 //or frontend
-app.post("/register", async (request, response) => {
-    const userSubmitted = request.body
-    let errors = []
-  
-    if(!userSubmitted.houseName|| !userSubmitted.username || !userSubmitted.password || !userSubmitted.confirmPassword) {
-      errors.push("PLEASE FILL IN ALL FIELDS");
-    } else {  
-      if(userSubmitted.username.length < 6) {
-        errors.push("USERNAME TOO SHORT");
-      }
-  
-      if(userSubmitted.password.length < 6) {
-        errors.push("PASSWORD TOO SHORT");
-      }
-
-      if(userSubmitted.password !== userSubmitted.confirmPassword) {
-        errors.push("PASSWORDS DO NOT MATCH");
-      }
-    }
-    
-    if(errors.length > 0) {
-      // MEANS SOMETHING WENT WRONG -- DECIDE WHAT WE WANT TO DISPLAY/HOW ------------------------------------------
-      console.log(errors);
-      response.send(errors);
-    } else {
-      // user information has been validated
-      userModel.findOne({ username: userSubmitted.username }) // check for registered username
-      .then((user) => {
-        if(user) {
-          // User with this username already exists
-          errors.push("USERNAME ALREADY REGISTERED");
-          // -----------------------------------------------------DISPLAY HOW WE WANT TO ----------------------
-          console.log(errors);
-          response.send(errors);
-        } else {
-          // user is now being created using our model
-          const newUser = new userModel({
-            houseName: userSubmitted.houseName,
-            username: userSubmitted.username,
-            password: userSubmitted.password,
-          });
-          
-          bcrypt.genSalt(10, (err, salt) => {
-            bcrypt.hash(newUser.password, salt, (err, hash) => {
-              if(err) {
-                throw err;
-              }
-        
-              newUser.password = hash;
-        
-              newUser.save()
-              .then(() => {
-                console.log("USER REGISTERED");
-                response.sendStatus(200);
-              })
-              .catch((err) => {
-                console.log("ERROR REGISTERING USER");
-                console.log(err);
-              });
-            });
-          });
-        }
+app.post("/login", (req, res, next) => {
+  passport.authenticate("local", (err, user, info) => {
+    if (err) throw err;
+    if (!user) res.send("No User Exists");
+    else {
+      req.logIn(user, (err) => {
+        if (err) throw err;
+        res.send("Successfully Authenticated");
+        console.log(req.user);
       });
     }
+  })(req, res, next);
 });
 
-app.post('/login', function(req, res, next) {
-  passport.authenticate('local', function(err, user, info) {
-    if (err) { 
-      return next(err); 
+app.post("/register", (req, res) => {
+  const {houseName, username, password, confirmPassword} = req.body;
+  let errors = [];
+
+  if(!houseName|| !username || !password || !confirmPassword) {
+    errors.push("PLEASE FILL IN ALL FIELDS");
+  } else {  
+    if(username.length < 6) {
+      errors.push("USERNAME TOO SHORT");
     }
 
-    if (!user) { 
-      console.log("redirected to login")
-      return res.sendStatus(200);
-    }
-
-    req.logIn(user, function(err) {
-      if (err) { 
-        return next(err); 
+    if(password !== confirmPassword) {
+      errors.push("PASSWORDS DO NOT MATCH");
+    } else {
+      if(password.length < 6) {
+        errors.push("PASSWORD TOO SHORT");
       }
-      console.log("success")
-      return res.send(user);
+    } 
+  }
+
+  if(errors.length > 0) {
+    res.send(errors);
+  } else {
+    User.findOne({ username: username }, async (err, user) => {
+      if (err) throw err;
+
+      if (user) {
+        errors.push("Username is taken");
+        res.send(errors);
+      }
+
+      if (!user) {
+        const hashedPassword = await bcrypt.hash(password, 10);
+        
+        const newUser = new User({
+          houseName: houseName,
+          username: username,
+          password: hashedPassword,
+        });
+  
+        await newUser.save().then(() => {
+          res.send("User Created");
+        });
+      }
     });
-  })(req, res, next);
+  }
 });
 
 // Logout Handle

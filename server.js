@@ -1,31 +1,39 @@
-const express = require("express");
-const session = require('express-session');
-const passport = require("passport");
-const LocalStrategy = require("passport-local");
 const mongoose = require("mongoose");
+const express = require("express");
 const cors = require("cors");
+const passport = require("passport");
+const cookieParser = require("cookie-parser");
+const session = require("express-session");
 const app = express();
 
-// configs -----------------------------------------------------------------------------------------------------------
+// configs ----------------------------------------------------------------------------------------------------------
 const databaseURI = require('./config/db.config').MongoURI; // Database Config
-require('./config/passport')(passport); // Passport Config
+require("./config/passport")(passport); // Passport Config
 
-// make a connection to mongoDB database
+// make a connection to mongoDB database ----------------------------------------------------------------------------
 mongoose.connect(databaseURI, { useNewUrlParser: true, useUnifiedTopology: true }) 
     .then(() => console.log('MongoDB connected...')) 
     .catch(err => console.error("MongoDB connection error", err));
 
-// middlewares -------------------------------------------------------------------------------------------------------
-app.use(express.json()); // parse requests of content-type - application/json
-app.use(express.urlencoded({ extended: true })); // parse requests of content-type - application/x-www-form-urlencoded
-app.use(cors());
+// middleware -------------------------------------------------------------------------------------------------------
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(
+  cors({
+    origin: "http://localhost:3000", // <-- location of the react app were connecting to
+    credentials: true,
+  })
+);
 
-app.use(session({
-    secret: 'secret key',
+app.use(
+  session({
+    secret: "secretcode",
     resave: true,
-    saveUninitialized: true
-})); // session to keep track of logged in user
+    saveUninitialized: true,
+  })
+);
 
+app.use(cookieParser("secretcode"));
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -36,15 +44,11 @@ app.use(function(req, res, next){
 });
 
 // routes ------------------------------------------------------------------------------------------------------------
-app.get("/", (req, res) => {
-    res.send(req.user);
-});
-
 app.use(require('./routes/users'));
 app.use(require('./routes/household'));
 
-// set port, listen for requests
-const PORT = process.env.PORT || 8080;
+// set port, listen for requests -------------------------------------------------------------------------------------
+const PORT = process.env.PORT || 4000;
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}.`);
