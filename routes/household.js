@@ -5,8 +5,8 @@ const axios = require("axios");
 const app = express();
 
 require('dotenv').config();
-const accountId = 'AC6fd1d1c6d22f8904aa7a70985f5ba104b79ef7e4';
-const apiKey = '4b225058cdaba2c6acb36c048a3df9e520fb98b5';
+const accountId = 'ACcabe723dfe4021d7a77923476fa5bd43454d8c3e';
+const apiKey = 'f750bdbec90a4febc3aee6a6bbd88f70e8418d37';
 const freeclimb = freeclimbSDK(accountId, apiKey);
 
 app.get("/", (req, res) => {
@@ -38,8 +38,8 @@ app.post('/createGroup', (req, res) => {
     const groupInfo = req.body;
     let errors = []
 
-    const accountId = 'AC6fd1d1c6d22f8904aa7a70985f5ba104b79ef7e4';
-    const apiKey = '4b225058cdaba2c6acb36c048a3df9e520fb98b5';
+    const accountId = 'ACcabe723dfe4021d7a77923476fa5bd43454d8c3e';
+    const apiKey = 'f750bdbec90a4febc3aee6a6bbd88f70e8418d37';
     const freeclimb = freeclimbSDK(accountId, apiKey);
     
     if(req.body.members.length < 2) {
@@ -75,7 +75,7 @@ app.post('/createGroup', (req, res) => {
                 
                 newGroup.save()
                 .then(() => {              
-                    let from = '+18162562790'
+                    let from = '+18157684448'
                     
                     for(const user of groupInfo.members) { // inform members theyve joined the group
                         let to = user["number"];
@@ -88,11 +88,11 @@ app.post('/createGroup', (req, res) => {
                         .then((group) => {
                             if(group) {
                                 console.log("Sending out chores...");
-                                const accountId = 'AC6fd1d1c6d22f8904aa7a70985f5ba104b79ef7e4';
-                                const apiKey = '4b225058cdaba2c6acb36c048a3df9e520fb98b5';
+                                const accountId = 'ACcabe723dfe4021d7a77923476fa5bd43454d8c3e';
+                                const apiKey = 'f750bdbec90a4febc3aee6a6bbd88f70e8418d37';
                                 const freeclimb = freeclimbSDK(accountId, apiKey);
 
-                                let from = '+18162562790'
+                                let from = '+18157684448'
                                 member = 0
 
                                 while(member < group.members.length) {
@@ -115,7 +115,7 @@ app.post('/createGroup', (req, res) => {
                                 console.log("Couldnt find group");
                             }
                         })
-                    }, 5000)
+                    }, 864000)
 
                     setInterval(() => {
                         console.log("Updating head...");
@@ -135,7 +135,7 @@ app.post('/createGroup', (req, res) => {
                                 //return res.send(group);
                             })
                         });
-                    }, 3000)
+                    }, 604800000)
                     
                     res.sendStatus(200)
                 }).catch((err) => console.log(err))
@@ -149,11 +149,11 @@ app.get("/sendChores", (req, res) => {
     .then((group) => {
         if(group) {
             console.log("Sending out chores...");
-            const accountId = 'AC6fd1d1c6d22f8904aa7a70985f5ba104b79ef7e4';
-            const apiKey = '4b225058cdaba2c6acb36c048a3df9e520fb98b5';
+            const accountId = 'ACcabe723dfe4021d7a77923476fa5bd43454d8c3e';
+            const apiKey = 'f750bdbec90a4febc3aee6a6bbd88f70e8418d37';
             const freeclimb = freeclimbSDK(accountId, apiKey);
 
-            let from = '+18162562790'
+            let from = '+18157684448'
             member = 0
 
             while(member < group.members.length) {
