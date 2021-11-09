@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const user = new mongoose.Schema({
-    houseName: {
+    address: {
       type: String,
       required: true
     },

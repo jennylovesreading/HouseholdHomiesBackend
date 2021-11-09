@@ -16,7 +16,7 @@ app.get("/", (req, res) => {
 app.get("/group", (req, res) => {
     if(req.user) {
         console.log("here");
-        groupModel.findOne({ houseName: req.user["houseName"] })
+        groupModel.findOne({ address: req.user["address"] })
         .then((group) => {
             if(group) {
                 res.send(group);
@@ -51,7 +51,7 @@ app.post('/createGroup', (req, res) => {
         console.log(errors);
         res.send(errors);
       } else {
-        groupModel.findOne({ houseName: req.user["houseName"] })
+        groupModel.findOne({ address: req.user["address"] })
         .then((user) => {
             if(user) {
                 // User with this username already exists
@@ -67,7 +67,7 @@ app.post('/createGroup', (req, res) => {
 
                 initialHead = Math.floor(getRandomInt(0, groupInfo.members.length));
                 const newGroup = new groupModel({
-                    houseName: req.user["houseName"],
+                    address: req.user["address"],
                     members: groupInfo.members,
                     chores: groupInfo.chores,
                     head: initialHead
@@ -79,12 +79,12 @@ app.post('/createGroup', (req, res) => {
                     
                     for(const user of groupInfo.members) { // inform members theyve joined the group
                         let to = user["number"];
-                        freeclimb.api.messages.create(from, to, 'Hey ' + user["name"] + '! You have joined the household ' + req.user["houseName"] + '!')
+                        freeclimb.api.messages.create(from, to, 'Hey ' + user["name"] + '! You have joined the household ' + req.user["address"] + '!')
                         .catch(err => console.log(err))
                     }
 
                     setInterval(() => {
-                        groupModel.findOne({ houseName: req.user["houseName"] })
+                        groupModel.findOne({ address: req.user["address"] })
                         .then((group) => {
                             if(group) {
                                 console.log("Sending out chores...");
@@ -115,11 +115,11 @@ app.post('/createGroup', (req, res) => {
                                 console.log("Couldnt find group");
                             }
                         })
-                    }, 864000)
+                    }, 86400000)
 
                     setInterval(() => {
                         console.log("Updating head...");
-                        groupModel.findOne({ houseName: req.user["houseName"] })
+                        groupModel.findOne({ address: req.user["address"] })
                         .then((group) => {
                             let newHead = group.head + 1;
 
@@ -127,7 +127,7 @@ app.post('/createGroup', (req, res) => {
                                 newHead = newHead % group.members.length;
                             }
                             
-                            groupModel.findOneAndUpdate({ houseName: group.houseName }, { head: newHead }, { new: true }, (err, group) => {
+                            groupModel.findOneAndUpdate({ address: group.address }, { head: newHead }, { new: true }, (err, group) => {
                                 // Handle any possible database errors
                                 if (err) 
                                     return res.status(500).send(err);
@@ -145,7 +145,7 @@ app.post('/createGroup', (req, res) => {
 })
 
 app.get("/sendChores", (req, res) => {
-    groupModel.findOne({ houseName: req.user["houseName"] })
+    groupModel.findOne({ address: req.user["address"] })
     .then((group) => {
         if(group) {
             console.log("Sending out chores...");
@@ -181,7 +181,7 @@ app.get("/sendChores", (req, res) => {
 
 app.put("/updateHead", (req, res) => {
     console.log("Updating head...");
-    groupModel.findOne({ houseName: req.user["houseName"] })
+    groupModel.findOne({ address: req.user["address"] })
     .then((group) => {
         let newHead = group.head + 1;
 
@@ -189,7 +189,7 @@ app.put("/updateHead", (req, res) => {
             newHead = newHead % group.members.length;
         }
         
-        groupModel.findOneAndUpdate({ houseName: group.houseName }, { head: newHead }, { new: true }, (err, group) => {
+        groupModel.findOneAndUpdate({ address: group.address }, { head: newHead }, { new: true }, (err, group) => {
             // Handle any possible database errors
             if (err) 
                 return res.status(500).send(err);

@@ -22,10 +22,10 @@ app.post("/login", (req, res, next) => {
 });
 
 app.post("/register", (req, res) => {
-  const {houseName, username, password, confirmPassword} = req.body;
+  const {address, username, password, confirmPassword} = req.body;
   let errors = [];
 
-  if(!houseName|| !username || !password || !confirmPassword) {
+  if(!address|| !username || !password || !confirmPassword) {
     errors.push("PLEASE FILL IN ALL FIELDS");
   } else {  
     if(username.length < 6) {
@@ -56,7 +56,7 @@ app.post("/register", (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
         
         const newUser = new User({
-          houseName: houseName,
+          address: address,
           username: username,
           password: hashedPassword,
         });
