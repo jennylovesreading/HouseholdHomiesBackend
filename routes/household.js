@@ -15,7 +15,6 @@ app.get("/", (req, res) => {
 
 app.get("/group", (req, res) => {
     if(req.user) {
-        console.log("here");
         groupModel.findOne({ address: req.user["address"] })
         .then((group) => {
             if(group) {
