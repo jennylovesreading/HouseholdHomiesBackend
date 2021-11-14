@@ -9,6 +9,15 @@ const accountId = 'ACcabe723dfe4021d7a77923476fa5bd43454d8c3e';
 const apiKey = 'f750bdbec90a4febc3aee6a6bbd88f70e8418d37';
 const freeclimb = freeclimbSDK(accountId, apiKey);
 
+app.post('/incomingSms', (req, res) => {
+    let to = '+13134002132' //your Verified Number
+    let from = '+18333412057' //your FreeClimb Number
+    console.log(res);
+    //response.body has message and from number that we will check with if statement
+    //if message returned is something 
+    freeclimb.api.messages.create(from, to, 'Hey! we are indicating we have received a text').catch(err => {console.log(err)})
+  });
+
 app.get("/", (req, res) => {
     res.send(req.user); // The req.user stores the entire user that has been authenticated inside of it.
 });
@@ -36,6 +45,8 @@ function getRandomInt(min, max) {
 app.post('/createGroup', (req, res) => {
     const groupInfo = req.body;
     let errors = []
+
+    console.log("I have entered create group");
 
     const accountId = 'ACcabe723dfe4021d7a77923476fa5bd43454d8c3e';
     const apiKey = 'f750bdbec90a4febc3aee6a6bbd88f70e8418d37';
@@ -74,8 +85,9 @@ app.post('/createGroup', (req, res) => {
                 
                 newGroup.save()
                 .then(() => {              
-                    let from = '+18157684448'
+                    let from = '+18333412057'
                     
+                    console.log("about to send created group text");
                     for(const user of groupInfo.members) { // inform members theyve joined the group
                         let to = user["number"];
                         freeclimb.api.messages.create(from, to, 'Hey ' + user["name"] + '! You have joined the household ' + req.user["address"] + '!')
@@ -91,7 +103,7 @@ app.post('/createGroup', (req, res) => {
                                 const apiKey = 'f750bdbec90a4febc3aee6a6bbd88f70e8418d37';
                                 const freeclimb = freeclimbSDK(accountId, apiKey);
 
-                                let from = '+18157684448'
+                                let from = '+18333412057'
                                 member = 0
 
                                 while(member < group.members.length) {
@@ -105,36 +117,56 @@ app.post('/createGroup', (req, res) => {
                                     
                                     var chores = group.chores[chorePos];
 
+                             
                                     freeclimb.api.messages.create(from, to, 'Hey ' + group.members[member]["name"] + '! Your chores for the week are:\n' + chores)
                                     .catch(err => console.log(err))
+                                    
+                                    getMessages().then(messages => {
+                                        // Use messages
+                                        console.log(messages)
+                                    }).catch(err => {
+                                        // Catch Errors
+                                    })
+                                    
 
                                     member++;
                                 }
                             } else {
                                 console.log("Couldnt find group");
                             }
-                        })
-                    }, 86400000)
 
-                    setInterval(() => {
-                        console.log("Updating head...");
-                        groupModel.findOne({ address: req.user["address"] })
-                        .then((group) => {
-                            let newHead = group.head + 1;
+                            
+                        //send chores text again(already handled)
+                        //send FINAL TEXT (remind all your housemates to do their chores)
+                        
+                            var d = new Date();
+                            if(d.getDay()===0){ //if it becomes sunday
+                                //then update head
+                                console.log("Updating head...");
+                                groupModel.findOne({ address: req.user["address"] })
+                                .then((group) => {
+                                    let newHead = group.head + 1;
 
-                            if(newHead >= group.members.length) {
-                                newHead = newHead % group.members.length;
+                                    if(newHead >= group.members.length) {
+                                        newHead = newHead % group.members.length;
+                                    }
+                                    
+                                    groupModel.findOneAndUpdate({ address: group.address }, { head: newHead }, { new: true }, (err, group) => {
+                                        // Handle any possible database errors
+                                        if (err) 
+                                            return res.status(500).send(err);
+
+                                        //return res.send(group);
+                                    })
+                                });
                             }
                             
-                            groupModel.findOneAndUpdate({ address: group.address }, { head: newHead }, { new: true }, (err, group) => {
-                                // Handle any possible database errors
-                                if (err) 
-                                    return res.status(500).send(err);
 
-                                //return res.send(group);
-                            })
-                        });
-                    }, 604800000)
+                        })
+
+                        
+                    }, 86400000)
+
                     
                     res.sendStatus(200)
                 }).catch((err) => console.log(err))
@@ -152,7 +184,7 @@ app.get("/sendChores", (req, res) => {
             const apiKey = 'f750bdbec90a4febc3aee6a6bbd88f70e8418d37';
             const freeclimb = freeclimbSDK(accountId, apiKey);
 
-            let from = '+18157684448'
+            let from = '+18333412057'
             member = 0
 
             while(member < group.members.length) {
@@ -200,4 +232,22 @@ app.put("/updateHead", (req, res) => {
     });
 });
   
+  
+
+  async function getMessages() {
+    // Create array to store all members 
+    const messages = []
+    // Invoke GET method to retrieve initial list of members information
+    const first = await freeclimb.api.messages.getList()
+    messages.push(...first.messages)
+    // Get Uri for next page
+    let nextPageUri = first.nextPageUri
+    // Retrieve entire members list 
+    while (nextPageUri) {
+      const nextPage = await freeclimb.api.messages.getNextPage(nextPageUri)
+      messages.push(...nextPage.messages)
+      nextPageUri = nextPage.nextPageUri
+    }
+    return messages
+  }
 module.exports = app;
