@@ -231,10 +231,8 @@ app.put("/updateHead", (req, res) => {
         })
     });
 });
-  
-  
 
-  async function getMessages() {
+async function getMessages() {
     // Create array to store all members 
     const messages = []
     // Invoke GET method to retrieve initial list of members information
@@ -244,10 +242,11 @@ app.put("/updateHead", (req, res) => {
     let nextPageUri = first.nextPageUri
     // Retrieve entire members list 
     while (nextPageUri) {
-      const nextPage = await freeclimb.api.messages.getNextPage(nextPageUri)
-      messages.push(...nextPage.messages)
-      nextPageUri = nextPage.nextPageUri
+        const nextPage = await freeclimb.api.messages.getNextPage(nextPageUri)
+        messages.push(...nextPage.messages)
+        nextPageUri = nextPage.nextPageUri
     }
     return messages
-  }
+}
+
 module.exports = app;
