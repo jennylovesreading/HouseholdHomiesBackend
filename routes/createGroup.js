@@ -1,7 +1,6 @@
 const express = require("express");
 const groupModel = require("../models/group");
 const freeclimbSDK = require('@freeclimb/sdk');
-const axios = require("axios");
 const app = express();
 
 require('dotenv').config();

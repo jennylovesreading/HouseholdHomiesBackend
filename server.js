@@ -46,6 +46,7 @@ app.use(function(req, res, next){
 // routes ------------------------------------------------------------------------------------------------------------
 app.use(require('./routes/users'));
 app.use(require('./routes/createGroup'));
+app.use(require('./routes/group'));
 
 // set port, listen for requests -------------------------------------------------------------------------------------
 const PORT = process.env.PORT || 4000;
