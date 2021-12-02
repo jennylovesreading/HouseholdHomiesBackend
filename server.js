@@ -9,7 +9,7 @@ const app = express();
 // configs ----------------------------------------------------------------------------------------------------------
 const databaseURI = require('./config/db.config').MongoURI; // Database Config
 require("./config/passport")(passport); // Passport Config
-
+console.log("to make connection to mongoDB");
 // make a connection to mongoDB database ----------------------------------------------------------------------------
 mongoose.connect(databaseURI, { useNewUrlParser: true, useUnifiedTopology: true }) 
     .then(() => console.log('MongoDB connected...')) 
@@ -49,8 +49,8 @@ app.use(require('./routes/createGroup'));
 app.use(require('./routes/group'));
 
 // set port, listen for requests -------------------------------------------------------------------------------------
-const PORT = process.env.PORT || 4000;
-
+const PORT = process.env.PORT || 4000;e
+console.log("about to listen to port");
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}.`);
 });
