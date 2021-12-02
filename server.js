@@ -40,7 +40,7 @@ app.use(passport.session());
 // Allows for access to user information after login
 app.use(function(req, res, next){
     console.log("saving user info");
-    console.log(req);
+    console.log(req.user);
     res.locals.user = req.user || null;
     next();
 });
