@@ -9,7 +9,7 @@ const app = express();
 // configs ----------------------------------------------------------------------------------------------------------
 const databaseURI = require('./config/db.config').MongoURI; // Database Config
 require("./config/passport")(passport); // Passport Config
-console.log("to make connection to mongoDB");
+
 // make a connection to mongoDB database ----------------------------------------------------------------------------
 mongoose.connect(databaseURI, { useNewUrlParser: true, useUnifiedTopology: true }) 
     .then(() => console.log('MongoDB connected...')) 
@@ -39,6 +39,7 @@ app.use(passport.session());
 
 // Allows for access to user information after login
 app.use(function(req, res, next){
+    console.log(req.user);
     res.locals.user = req.user || null;
     next();
 });
@@ -50,7 +51,7 @@ app.use(require('./routes/group'));
 
 // set port, listen for requests -------------------------------------------------------------------------------------
 const PORT = process.env.PORT || 4000;
-console.log("about to listen to port");
-app.listen(PORT,"0.0.0.0", () => {
+
+app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}.`);
 });
