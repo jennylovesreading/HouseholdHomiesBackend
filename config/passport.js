@@ -11,8 +11,10 @@ module.exports = function (passport) {
         bcrypt.compare(password, user.password, (err, result) => { // user is found, so now check password
           if (err) throw err;
           if (result) {
+            console.log("user authenticated");
             return done(null, user); // user authenticated
           } else {
+            console.log("not authenticated");
             return done(null, false); // user not authenticated
           }
         });
