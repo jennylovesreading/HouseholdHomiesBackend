@@ -51,6 +51,6 @@ app.use(require('./routes/group'));
 // set port, listen for requests -------------------------------------------------------------------------------------
 const PORT = process.env.PORT || 4000;
 console.log("about to listen to port");
-app.listen(PORT, () => {
+app.listen(PORT,"0.0.0.0", () => {
   console.log(`Server is running on port ${PORT}.`);
 });
