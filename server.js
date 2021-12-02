@@ -20,7 +20,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
   cors({
-    origin: ["https://householdhomies-backend.herokuapp.com/", "https://61a7d0ff11bb9a00078446da--romantic-wright-f98d7e.netlify.app/"], // <-- location of the react app were connecting to
+    origin: ["https://householdhomies-backend.herokuapp.com/", "https://romantic-wright-f98d7e.netlify.app/"], // <-- location of the react app were connecting to
     credentials: true,
   })
 );
